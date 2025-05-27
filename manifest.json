@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "name": "My Camera MiniApp",
+  "requiredPermissions": [
+    {
+      "name": "CAMERA",
+      "reason": "Cần sử dụng camera để chụp ảnh"
+    },
+    {
+      "name": "PHOTO",
+      "reason": "Cần truy cập thư viện ảnh để chọn ảnh"
+    }
+  ]
+}

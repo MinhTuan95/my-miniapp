@@ -1,15 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mini App Demo</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8">
+  <title>Chọn hoặc chụp ảnh</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    img {
+      margin-top: 20px;
+      max-width: 90%;
+      height: auto;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello from Mini App 👋</h1>
-  <p>This is a sample Mini App hosted on GitHub Pages.</p>
-  <button onclick="handleClick()">Tap me</button>
-  <script src="script.js"></script>
+
+  <h1>Chọn hoặc chụp ảnh</h1>
+
+  <!-- Nút chọn ảnh hoặc chụp bằng camera -->
+  <input type="file" id="imageInput" accept="image/*" capture="environment">
+
+  <!-- Ảnh hiển thị sau khi chọn -->
+  <div>
+    <img id="preview" src="" alt="Ảnh sẽ hiển thị tại đây" hidden>
+  </div>
+
+  <script>
+    const input = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+
+    input.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.hidden = false;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+
 </body>
 </html>
