@@ -1,50 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Chọn hoặc chụp ảnh</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    img {
-      margin-top: 20px;
-      max-width: 90%;
-      height: auto;
-      border: 1px solid #ccc;
-    }
-  </style>
-</head>
-<body>
+  <title>Flutter Web + JS Interop</title>
+  <meta name="description" content="Test JS and Flutter interop with permissions">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <h1>Chọn hoặc chụp ảnh</h1>
-
-  <!-- Nút chọn ảnh hoặc chụp bằng camera -->
-  <input type="file" id="imageInput" accept="image/*" capture="environment">
-
-  <!-- Ảnh hiển thị sau khi chọn -->
-  <div>
-    <img id="preview" src="" alt="Ảnh sẽ hiển thị tại đây" hidden>
-  </div>
+  <!-- Yêu cầu quyền -->
+  <meta name="permissions-policy" content="camera=*, microphone=*, geolocation=*, clipboard-read=*, clipboard-write=*">
+  
+  <!-- Cho phép truy cập camera và mic -->
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), clipboard-read=(), clipboard-write=()">
 
   <script>
-    const input = document.getElementById('imageInput');
-    const preview = document.getElementById('preview');
+    // Hàm JS được Flutter gọi
+    function showAlertFromJS(message) {
+      alert("JS Received: " + message);
+    }
 
-    input.addEventListener('change', function () {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          preview.src = e.target.result;
-          preview.hidden = false;
-        };
-        reader.readAsDataURL(file);
+    // JS gọi ngược lại Flutter
+    function callFlutter() {
+      if (window.flutterInterop) {
+        window.flutterInterop("Hello from JS to Flutter!");
       }
-    });
-  </script>
+    }
 
+    // Kiểm tra quyền truy cập camera
+    async function requestCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        alert("Camera access granted");
+        stream.getTracks().forEach(track => track.stop());
+      } catch (err) {
+        alert("Camera access denied: " + err);
+      }
+    }
+
+    // Kiểm tra quyền truy cập microphone
+    async function requestMicrophone() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        alert("Microphone access granted");
+        stream.getTracks().forEach(track => track.stop());
+      } catch (err) {
+        alert("Microphone access denied: " + err);
+      }
+    }
+
+    // Kiểm tra quyền truy cập vị trí
+    function requestGeolocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => alert("Geolocation granted: " + pos.coords.latitude + ", " + pos.coords.longitude),
+          err => alert("Geolocation denied: " + err.message)
+        );
+      } else {
+        alert("Geolocation not supported");
+      }
+    }
+
+    // Kiểm tra quyền truy cập clipboard
+    async function requestClipboardRead() {
+      try {
+        const text = await navigator.clipboard.readText();
+        alert("Clipboard content: " + text);
+      } catch (err) {
+        alert("Clipboard read denied: " + err);
+      }
+    }
+
+    async function requestClipboardWrite() {
+      try {
+        await navigator.clipboard.writeText("Copied from JS");
+        alert("Clipboard write success");
+      } catch (err) {
+        alert("Clipboard write denied: " + err);
+      }
+    }
+  </script>
+</head>
+<body>
+  <script src="main.dart.js" type="application/javascript"></script>
 </body>
 </html>
