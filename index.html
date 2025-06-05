@@ -3,29 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <title>Flutter Web + JS Interop</title>
-  <meta name="description" content="Test JS and Flutter interop with permissions">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Yêu cầu quyền -->
+  <!-- Quyền truy cập -->
   <meta name="permissions-policy" content="camera=*, microphone=*, geolocation=*, clipboard-read=*, clipboard-write=*">
-  
-  <!-- Cho phép truy cập camera và mic -->
-  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), clipboard-read=(), clipboard-write=()">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    button {
+      margin: 6px;
+      padding: 8px 14px;
+      font-size: 16px;
+    }
+  </style>
 
   <script>
-    // Hàm JS được Flutter gọi
-    function showAlertFromJS(message) {
-      alert("JS Received: " + message);
+    // JS gọi Flutter với dữ liệu khác nhau
+    function callFlutterWithString() {
+      window.flutterInterop?.("Hello from JS");
     }
 
-    // JS gọi ngược lại Flutter
-    function callFlutter() {
-      if (window.flutterInterop) {
-        window.flutterInterop("Hello from JS to Flutter!");
-      }
+    function callFlutterWithNumber() {
+      window.flutterInterop?.(2025);
     }
 
-    // Kiểm tra quyền truy cập camera
+    function callFlutterWithArray() {
+      window.flutterInterop?.(["one", 2, true]);
+    }
+
+    function callFlutterWithObject() {
+      const data = {
+        name: "OpenAI",
+        features: ["AI", "ChatGPT", "Codex"],
+        isCool: true,
+        year: 2025
+      };
+      window.flutterInterop?.(JSON.stringify(data)); // hoặc truyền object trực tiếp
+    }
+
+    // Quyền truy cập
     async function requestCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -36,7 +55,6 @@
       }
     }
 
-    // Kiểm tra quyền truy cập microphone
     async function requestMicrophone() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -47,7 +65,6 @@
       }
     }
 
-    // Kiểm tra quyền truy cập vị trí
     function requestGeolocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -59,7 +76,6 @@
       }
     }
 
-    // Kiểm tra quyền truy cập clipboard
     async function requestClipboardRead() {
       try {
         const text = await navigator.clipboard.readText();
@@ -80,6 +96,26 @@
   </script>
 </head>
 <body>
+
+  <h2>JS → Flutter Interop Test</h2>
+
+  <button onclick="callFlutterWithString()">Call Flutter with String</button>
+  <button onclick="callFlutterWithNumber()">Call Flutter with Number</button>
+  <button onclick="callFlutterWithArray()">Call Flutter with Array</button>
+  <button onclick="callFlutterWithObject()">Call Flutter with Object</button>
+
+  <hr/>
+
+  <h2>Test Permissions</h2>
+
+  <button onclick="requestCamera()">Request Camera</button>
+  <button onclick="requestMicrophone()">Request Microphone</button>
+  <button onclick="requestGeolocation()">Request Geolocation</button>
+  <button onclick="requestClipboardRead()">Read from Clipboard</button>
+  <button onclick="requestClipboardWrite()">Write to Clipboard</button>
+
+  <!-- Flutter app script -->
   <script src="main.dart.js" type="application/javascript"></script>
+
 </body>
 </html>
