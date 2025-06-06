@@ -1,121 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Flutter Web + JS Interop</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Quyền truy cập -->
-  <meta name="permissions-policy" content="camera=*, microphone=*, geolocation=*, clipboard-read=*, clipboard-write=*">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    button {
-      margin: 6px;
-      padding: 8px 14px;
-      font-size: 16px;
-    }
-  </style>
-
+  <meta charset="UTF-8" />
+  <title>MiniApp Test</title>
   <script>
-    // JS gọi Flutter với dữ liệu khác nhau
-    function callFlutterWithString() {
-      window.flutterInterop?.("Hello from JS");
+    // Gửi message sang Flutter
+    function sendToFlutter() {
+      window.flutter_inappwebview.callHandler('fromWeb', 'Hello from Web');
     }
 
-    function callFlutterWithNumber() {
-      window.flutterInterop?.(2025);
+    // Nhận message từ Flutter (nếu bạn inject JS để gọi hàm này)
+    function receiveFromFlutter(message) {
+      const output = document.getElementById("output");
+      output.innerText = "Received from Flutter: " + message;
     }
 
-    function callFlutterWithArray() {
-      window.flutterInterop?.(["one", 2, true]);
+    // Test alert
+    function showAlert() {
+      alert("This is a JS alert");
     }
 
-    function callFlutterWithObject() {
-      const data = {
-        name: "OpenAI",
-        features: ["AI", "ChatGPT", "Codex"],
-        isCool: true,
-        year: 2025
-      };
-      window.flutterInterop?.(JSON.stringify(data)); // hoặc truyền object trực tiếp
-    }
-
-    // Quyền truy cập
-    async function requestCamera() {
+    // Test camera (triggers permission prompt)
+    async function openCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        alert("Camera access granted");
-        stream.getTracks().forEach(track => track.stop());
-      } catch (err) {
-        alert("Camera access denied: " + err);
-      }
-    }
-
-    async function requestMicrophone() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        alert("Microphone access granted");
-        stream.getTracks().forEach(track => track.stop());
-      } catch (err) {
-        alert("Microphone access denied: " + err);
-      }
-    }
-
-    function requestGeolocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          pos => alert("Geolocation granted: " + pos.coords.latitude + ", " + pos.coords.longitude),
-          err => alert("Geolocation denied: " + err.message)
-        );
-      } else {
-        alert("Geolocation not supported");
-      }
-    }
-
-    async function requestClipboardRead() {
-      try {
-        const text = await navigator.clipboard.readText();
-        alert("Clipboard content: " + text);
-      } catch (err) {
-        alert("Clipboard read denied: " + err);
-      }
-    }
-
-    async function requestClipboardWrite() {
-      try {
-        await navigator.clipboard.writeText("Copied from JS");
-        alert("Clipboard write success");
-      } catch (err) {
-        alert("Clipboard write denied: " + err);
+        document.getElementById("camera-status").innerText = "Camera accessed!";
+        stream.getTracks().forEach(track => track.stop()); // stop after success
+      } catch (e) {
+        document.getElementById("camera-status").innerText = "Camera access error: " + e.message;
       }
     }
   </script>
 </head>
 <body>
+  <h2>MiniApp Demo</h2>
 
-  <h2>JS → Flutter Interop Test</h2>
+  <button onclick="sendToFlutter()">Send to Flutter</button><br/><br/>
+  <button onclick="showAlert()">Trigger JS Alert</button><br/><br/>
+  <button onclick="openCamera()">Open Camera</button><br/><br/>
 
-  <button onclick="callFlutterWithString()">Call Flutter with String</button>
-  <button onclick="callFlutterWithNumber()">Call Flutter with Number</button>
-  <button onclick="callFlutterWithArray()">Call Flutter with Array</button>
-  <button onclick="callFlutterWithObject()">Call Flutter with Object</button>
-
-  <hr/>
-
-  <h2>Test Permissions</h2>
-
-  <button onclick="requestCamera()">Request Camera</button>
-  <button onclick="requestMicrophone()">Request Microphone</button>
-  <button onclick="requestGeolocation()">Request Geolocation</button>
-  <button onclick="requestClipboardRead()">Read from Clipboard</button>
-  <button onclick="requestClipboardWrite()">Write to Clipboard</button>
-
-  <!-- Flutter app script -->
-  <script src="main.dart.js" type="application/javascript"></script>
-
+  <p id="camera-status"></p>
+  <p id="output"></p>
 </body>
 </html>
