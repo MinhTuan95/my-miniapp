@@ -2,44 +2,51 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>MiniApp Test</title>
-  <script>
-    // Gửi message sang Flutter
-    function sendToFlutter() {
-      window.flutter_inappwebview.callHandler('fromWeb', 'Hello from Web');
+  <title>Mini App Test</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
     }
-
-    // Nhận message từ Flutter (nếu bạn inject JS để gọi hàm này)
-    function receiveFromFlutter(message) {
-      const output = document.getElementById("output");
-      output.innerText = "Received from Flutter: " + message;
+    button {
+      padding: 10px 20px;
+      margin: 10px 0;
+      font-size: 16px;
     }
-
-    // Test alert
-    function showAlert() {
-      alert("This is a JS alert");
-    }
-
-    // Test camera (triggers permission prompt)
-    async function openCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        document.getElementById("camera-status").innerText = "Camera accessed!";
-        stream.getTracks().forEach(track => track.stop()); // stop after success
-      } catch (e) {
-        document.getElementById("camera-status").innerText = "Camera access error: " + e.message;
-      }
-    }
-  </script>
+  </style>
 </head>
 <body>
-  <h2>MiniApp Demo</h2>
 
-  <button onclick="sendToFlutter()">Send to Flutter</button><br/><br/>
-  <button onclick="showAlert()">Trigger JS Alert</button><br/><br/>
-  <button onclick="openCamera()">Open Camera</button><br/><br/>
+  <h2>Test Mini App Communication</h2>
 
-  <p id="camera-status"></p>
-  <p id="output"></p>
+  <!-- Nút dành cho WebView Flutter -->
+  <button onclick="sendToFlutterWebView()">Send to webview_flutter</button>
+
+  <!-- Nút dành cho InAppWebView -->
+  <button onclick="sendToInAppWebView()">Send to flutter_inappwebview</button>
+
+  <script>
+    function sendToFlutterWebView() {
+      if (window.fromWeb && window.fromWeb.postMessage) {
+        window.fromWeb.postMessage('Hello from web to webview_flutter');
+      } else {
+        alert('window.fromWeb not found');
+      }
+    }
+
+    function sendToInAppWebView() {
+      if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
+        window.flutter_inappwebview.callHandler('fromWeb', 'Hello from web to inappwebview');
+      } else {
+        alert('window.flutter_inappwebview not found');
+      }
+    }
+
+    // Hàm Flutter có thể gọi
+    function receiveFromFlutter(message) {
+      alert("Received from Flutter: " + message);
+    }
+  </script>
+
 </body>
 </html>
